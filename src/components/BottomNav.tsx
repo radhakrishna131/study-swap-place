@@ -2,13 +2,13 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Search, Plus, Heart, User } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
-const items = [
+const items: { to: "/" | "/browse" | "/sell" | "/saved" | "/profile"; label: string; icon: typeof Home; primary?: boolean }[] = [
   { to: "/", label: "Home", icon: Home },
   { to: "/browse", label: "Browse", icon: Search },
   { to: "/sell", label: "Sell", icon: Plus, primary: true },
   { to: "/saved", label: "Saved", icon: Heart },
   { to: "/profile", label: "Profile", icon: User },
-] as const;
+];
 
 export function BottomNav() {
   const { user } = useAuth();
