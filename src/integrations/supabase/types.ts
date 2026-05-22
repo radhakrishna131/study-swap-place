@@ -14,7 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      favorites: {
+        Row: {
+          created_at: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          category: Database["public"]["Enums"]["listing_category"]
+          college: string
+          condition: Database["public"]["Enums"]["listing_condition"]
+          created_at: string
+          description: string
+          hostel: string | null
+          id: string
+          images: string[]
+          negotiable: boolean
+          pickup_location: string | null
+          price: number
+          seller_id: string
+          status: Database["public"]["Enums"]["listing_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["listing_category"]
+          college?: string
+          condition: Database["public"]["Enums"]["listing_condition"]
+          created_at?: string
+          description?: string
+          hostel?: string | null
+          id?: string
+          images?: string[]
+          negotiable?: boolean
+          pickup_location?: string | null
+          price: number
+          seller_id: string
+          status?: Database["public"]["Enums"]["listing_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["listing_category"]
+          college?: string
+          condition?: Database["public"]["Enums"]["listing_condition"]
+          created_at?: string
+          description?: string
+          hostel?: string | null
+          id?: string
+          images?: string[]
+          negotiable?: boolean
+          pickup_location?: string | null
+          price?: number
+          seller_id?: string
+          status?: Database["public"]["Enums"]["listing_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          college: string
+          created_at: string
+          department: string | null
+          full_name: string
+          hostel: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          avatar_url?: string | null
+          college?: string
+          created_at?: string
+          department?: string | null
+          full_name?: string
+          hostel?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          avatar_url?: string | null
+          college?: string
+          created_at?: string
+          department?: string | null
+          full_name?: string
+          hostel?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +141,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      listing_category:
+        | "books"
+        | "notes"
+        | "electronics"
+        | "transport"
+        | "hostel"
+        | "sports"
+        | "gaming"
+        | "music"
+        | "other"
+      listing_condition: "new" | "like_new" | "good" | "fair" | "poor"
+      listing_status: "available" | "reserved" | "sold"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +279,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      listing_category: [
+        "books",
+        "notes",
+        "electronics",
+        "transport",
+        "hostel",
+        "sports",
+        "gaming",
+        "music",
+        "other",
+      ],
+      listing_condition: ["new", "like_new", "good", "fair", "poor"],
+      listing_status: ["available", "reserved", "sold"],
+    },
   },
 } as const
