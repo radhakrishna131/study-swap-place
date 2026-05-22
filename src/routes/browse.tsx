@@ -58,7 +58,7 @@ function BrowsePage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ search: (s) => ({ ...s, q: query || undefined }) });
+            navigate({ search: (s: { category?: string; q?: string }) => ({ ...s, q: query || undefined }) });
           }}
           className="relative max-w-xl"
         >
