@@ -196,15 +196,53 @@ function ListingDetail() {
             </div>
           ) : (
             <div className="space-y-2">
-              {seller?.phone ? (
-                <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={() => setShowPhone(true)}
-                >
-                  <Phone className="h-4 w-4" />
-                  {showPhone ? seller.phone : "Show seller's number"}
-                </Button>
+              {seller?.phone || seller?.whatsapp || seller?.instagram ? (
+                <>
+                  {!showContact ? (
+                    <Button
+                      size="lg"
+                      className="w-full"
+                      onClick={() => setShowContact(true)}
+                    >
+                      <MessageCircle className="h-4 w-4" /> Show seller contact
+                      {seller?.preferred_contact && (
+                        <span className="ml-1 text-xs opacity-70">· prefers {seller.preferred_contact}</span>
+                      )}
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      {seller.whatsapp && (
+                        <Button asChild size="lg" className="w-full bg-success hover:bg-success/90 text-background">
+                          <a
+                            href={`https://wa.me/${seller.whatsapp.replace(/[^\d]/g, "")}?text=${encodeURIComponent(`Hi! I'm interested in your "${data.title}" on CampusCart.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <MessageCircle className="h-4 w-4" /> WhatsApp · {seller.whatsapp}
+                          </a>
+                        </Button>
+                      )}
+                      {seller.phone && (
+                        <Button asChild size="lg" variant="outline" className="w-full border-2 border-ink">
+                          <a href={`tel:${seller.phone}`}>
+                            <Phone className="h-4 w-4" /> Call · {seller.phone}
+                          </a>
+                        </Button>
+                      )}
+                      {seller.instagram && (
+                        <Button asChild size="lg" variant="outline" className="w-full border-2 border-ink">
+                          <a
+                            href={`https://instagram.com/${seller.instagram}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Instagram className="h-4 w-4" /> @{seller.instagram}
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </>
               ) : (
                 <Button size="lg" className="w-full" disabled>
                   <MessageCircle className="h-4 w-4" /> Seller hasn't added contact
