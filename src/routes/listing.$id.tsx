@@ -77,6 +77,29 @@ function ListingDetail() {
   const seller = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles;
   const images: string[] = data.images ?? [];
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: data.title,
+    description: data.description || data.title,
+    image: images,
+    category: data.category,
+    offers: {
+      "@type": "Offer",
+      price: data.price,
+      priceCurrency: "INR",
+      availability:
+        data.status === "available"
+          ? "https://schema.org/InStock"
+          : "https://schema.org/SoldOut",
+      areaServed: data.college || "Campus",
+      seller: {
+        "@type": "Person",
+        name: seller?.full_name || "Student",
+      },
+    },
+  };
+
   async function toggleFav() {
     if (!user) {
       navigate({ to: "/login" });
