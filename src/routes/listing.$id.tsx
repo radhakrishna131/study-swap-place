@@ -7,6 +7,7 @@ import {
   MapPin,
   MessageCircle,
   Phone,
+  Instagram,
   Trash2,
   Loader2,
 } from "lucide-react";
@@ -27,14 +28,14 @@ function ListingDetail() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [active, setActive] = useState(0);
-  const [showPhone, setShowPhone] = useState(false);
+  const [showContact, setShowContact] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("listings")
-        .select("*, profiles:seller_id(full_name,verified,college,department,phone,avatar_url)")
+        .select("*, profiles:seller_id(full_name,verified,college,department,phone,whatsapp,instagram,preferred_contact,avatar_url)")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -76,6 +77,29 @@ function ListingDetail() {
   const seller = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles;
   const images: string[] = data.images ?? [];
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: data.title,
+    description: data.description || data.title,
+    image: images,
+    category: data.category,
+    offers: {
+      "@type": "Offer",
+      price: data.price,
+      priceCurrency: "INR",
+      availability:
+        data.status === "available"
+          ? "https://schema.org/InStock"
+          : "https://schema.org/SoldOut",
+      areaServed: data.college || "Campus",
+      seller: {
+        "@type": "Person",
+        name: seller?.full_name || "Student",
+      },
+    },
+  };
+
   async function toggleFav() {
     if (!user) {
       navigate({ to: "/login" });
@@ -107,6 +131,10 @@ function ListingDetail() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="grid lg:grid-cols-5 gap-8">
         {/* Gallery */}
         <div className="lg:col-span-3">
@@ -195,15 +223,53 @@ function ListingDetail() {
             </div>
           ) : (
             <div className="space-y-2">
-              {seller?.phone ? (
-                <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={() => setShowPhone(true)}
-                >
-                  <Phone className="h-4 w-4" />
-                  {showPhone ? seller.phone : "Show seller's number"}
-                </Button>
+              {seller?.phone || seller?.whatsapp || seller?.instagram ? (
+                <>
+                  {!showContact ? (
+                    <Button
+                      size="lg"
+                      className="w-full"
+                      onClick={() => setShowContact(true)}
+                    >
+                      <MessageCircle className="h-4 w-4" /> Show seller contact
+                      {seller?.preferred_contact && (
+                        <span className="ml-1 text-xs opacity-70">· prefers {seller.preferred_contact}</span>
+                      )}
+                    </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      {seller.whatsapp && (
+                        <Button asChild size="lg" className="w-full bg-success hover:bg-success/90 text-background">
+                          <a
+                            href={`https://wa.me/${seller.whatsapp.replace(/[^\d]/g, "")}?text=${encodeURIComponent(`Hi! I'm interested in your "${data.title}" on CampusCart.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <MessageCircle className="h-4 w-4" /> WhatsApp · {seller.whatsapp}
+                          </a>
+                        </Button>
+                      )}
+                      {seller.phone && (
+                        <Button asChild size="lg" variant="outline" className="w-full border-2 border-ink">
+                          <a href={`tel:${seller.phone}`}>
+                            <Phone className="h-4 w-4" /> Call · {seller.phone}
+                          </a>
+                        </Button>
+                      )}
+                      {seller.instagram && (
+                        <Button asChild size="lg" variant="outline" className="w-full border-2 border-ink">
+                          <a
+                            href={`https://instagram.com/${seller.instagram}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Instagram className="h-4 w-4" /> @{seller.instagram}
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </>
               ) : (
                 <Button size="lg" className="w-full" disabled>
                   <MessageCircle className="h-4 w-4" /> Seller hasn't added contact

@@ -24,6 +24,9 @@ function ProfilePage() {
     department: "",
     hostel: "",
     phone: "",
+    whatsapp: "",
+    instagram: "",
+    preferred_contact: "phone",
   });
   const [saving, setSaving] = useState(false);
 
@@ -53,6 +56,9 @@ function ProfilePage() {
         department: profile.department ?? "",
         hostel: profile.hostel ?? "",
         phone: profile.phone ?? "",
+        whatsapp: (profile as { whatsapp?: string }).whatsapp ?? "",
+        instagram: (profile as { instagram?: string }).instagram ?? "",
+        preferred_contact: (profile as { preferred_contact?: string }).preferred_contact ?? "phone",
       });
     }
   }, [profile]);
@@ -126,8 +132,29 @@ function ProfilePage() {
           <Input id="host" value={form.hostel} onChange={(e) => setForm({ ...form, hostel: e.target.value })} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone (shared with interested buyers)</Label>
-          <Input id="phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <Label htmlFor="phone">Phone</Label>
+          <Input id="phone" placeholder="+91 9xxxxxxxxx" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="wa">WhatsApp</Label>
+          <Input id="wa" placeholder="+91 9xxxxxxxxx" value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="ig">Instagram handle</Label>
+          <Input id="ig" placeholder="yourhandle (no @)" value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value.replace(/^@/, "") })} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="pc">Preferred contact</Label>
+          <select
+            id="pc"
+            value={form.preferred_contact}
+            onChange={(e) => setForm({ ...form, preferred_contact: e.target.value })}
+            className="h-10 w-full rounded-md border-2 border-ink bg-background px-3 text-sm"
+          >
+            <option value="phone">Phone call</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="instagram">Instagram DM</option>
+          </select>
         </div>
         <div className="sm:col-span-2">
           <Button type="submit" disabled={saving}>
