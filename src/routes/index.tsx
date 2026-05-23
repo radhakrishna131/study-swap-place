@@ -1,23 +1,86 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, BadgeCheck, MapPin, Sparkles, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/categories";
+import { supabase } from "@/integrations/supabase/client";
+import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 
 export const Route = createFileRoute("/")({
   component: Landing,
   head: () => ({
     meta: [
-      { title: "CampusCart — The student marketplace for your campus" },
+      { title: "CampusCart — Student Marketplace to Buy & Sell on Your Campus" },
       {
         name: "description",
         content:
-          "Buy and sell books, electronics, cycles and hostel essentials with verified students from your college.",
+          "CampusCart is India's hyperlocal student marketplace. Buy and sell second-hand books, electronics, cycles, calculators and hostel essentials with verified college students near you.",
+      },
+      {
+        name: "keywords",
+        content:
+          "student marketplace, college marketplace India, buy sell books college, second hand cycle hostel, used calculator engineering, campus classifieds, hostel essentials",
+      },
+      { property: "og:title", content: "CampusCart — Buy & sell on your campus" },
+      {
+        property: "og:description",
+        content: "Verified students. Hyperlocal deals. No sketchy strangers.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "/" },
+      { name: "geo.region", content: "IN" },
+      { name: "geo.placename", content: "India" },
+      { name: "ICBM", content: "20.5937, 78.9629" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "CampusCart",
+          url: "/",
+          description:
+            "Hyperlocal student marketplace for Indian college campuses.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "/browse?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
       },
     ],
   }),
 });
 
 function Landing() {
+  const { data: latest } = useQuery({
+    queryKey: ["latest-listings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("listings")
+        .select(
+          "id,title,price,images,category,college,hostel,status,seller_id,profiles:seller_id(full_name,verified)"
+        )
+        .eq("status", "available")
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return (data ?? []).map((row) => ({
+        id: row.id,
+        title: row.title,
+        price: row.price,
+        images: row.images ?? [],
+        category: row.category,
+        college: row.college,
+        hostel: row.hostel,
+        status: row.status,
+        seller: Array.isArray(row.profiles) ? row.profiles[0] : row.profiles,
+      })) as ListingCardData[];
+    },
+  });
+
   return (
     <div>
       {/* Hero */}
@@ -111,6 +174,38 @@ function Landing() {
             </Link>
           ))}
         </div>
+      </section>
+
+      {/* Latest listings */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-16">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">Fresh on campus</h2>
+            <p className="text-muted-foreground mt-2">The latest listings from students near you.</p>
+          </div>
+          <Button asChild variant="outline" className="border-2 border-ink hidden sm:inline-flex">
+            <Link to="/browse">See all <ArrowRight className="h-4 w-4" /></Link>
+          </Button>
+        </div>
+        {!latest ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="aspect-square rounded-2xl bg-secondary animate-pulse" />
+            ))}
+          </div>
+        ) : latest.length === 0 ? (
+          <div className="rounded-3xl border-2 border-dashed border-ink/20 p-12 text-center">
+            <p className="text-muted-foreground">
+              No listings yet. <Link to="/sell" className="font-bold underline">Be the first to sell something!</Link>
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {latest.map((l) => (
+              <ListingCard key={l.id} listing={l} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* How */}
