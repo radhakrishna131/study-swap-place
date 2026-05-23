@@ -103,9 +103,12 @@ export type Database = {
           full_name: string
           hostel: string | null
           id: string
+          instagram: string | null
           phone: string | null
+          preferred_contact: string
           updated_at: string
           verified: boolean
+          whatsapp: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -115,9 +118,12 @@ export type Database = {
           full_name?: string
           hostel?: string | null
           id: string
+          instagram?: string | null
           phone?: string | null
+          preferred_contact?: string
           updated_at?: string
           verified?: boolean
+          whatsapp?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -127,9 +133,12 @@ export type Database = {
           full_name?: string
           hostel?: string | null
           id?: string
+          instagram?: string | null
           phone?: string | null
+          preferred_contact?: string
           updated_at?: string
           verified?: boolean
+          whatsapp?: string | null
         }
         Relationships: []
       }
