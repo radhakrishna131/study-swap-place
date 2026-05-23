@@ -8,38 +8,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const schema = z.object({
-  email: z.string().email("Enter a valid email").max(255),
-  password: z.string().min(6, "At least 6 characters").max(72),
+const schema = z.object({ email: z.string().email("Enter a valid email").max(255) });
+
+export const Route = createFileRoute("/forgot-password")({
+  component: ForgotPasswordPage,
+  head: () => ({
+    meta: [
+      { title: "Forgot password — CampusCart" },
+      { name: "description", content: "Reset your CampusCart password with a one-time code sent to your email." },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
 });
 
-export const Route = createFileRoute("/login")({
-  component: LoginPage,
-  head: () => ({ meta: [{ title: "Sign in — CampusCart" }] }),
-});
-
-function LoginPage() {
+function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
-      return;
-    }
+    const parsed = schema.safeParse({ email });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
     setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success("Welcome back!");
-    navigate({ to: "/browse" });
+    if (error) return toast.error(error.message);
+
+    toast.success("Check your email for a 6-digit code");
+    navigate({ to: "/reset-password", search: { email } });
   }
 
   return (
@@ -51,8 +49,10 @@ function LoginPage() {
           </span>
         </Link>
         <div className="rounded-3xl border-2 border-ink bg-card shadow-pop p-8">
-          <h1 className="font-display text-3xl font-bold">Welcome back</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Sign in to your campus account.</p>
+          <h1 className="font-display text-3xl font-bold">Forgot password?</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Enter your email and we'll send a 6-digit code.
+          </p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">College email</Label>
@@ -66,30 +66,14 @@ function LoginPage() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-              />
-            </div>
-            <div className="flex justify-end -mt-2">
-              <Link to="/forgot-password" className="text-xs font-semibold text-ink hover:underline">
-                Forgot password?
-              </Link>
-            </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? "Sending…" : "Send code"}
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            New here?{" "}
-            <Link to="/signup" className="font-semibold text-ink hover:underline">
-              Create an account
+            Remembered it?{" "}
+            <Link to="/login" className="font-semibold text-ink hover:underline">
+              Back to sign in
             </Link>
           </p>
         </div>
