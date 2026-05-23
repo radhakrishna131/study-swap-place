@@ -131,6 +131,10 @@ function ListingDetail() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="grid lg:grid-cols-5 gap-8">
         {/* Gallery */}
         <div className="lg:col-span-3">
