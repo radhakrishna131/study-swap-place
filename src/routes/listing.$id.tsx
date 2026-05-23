@@ -7,6 +7,7 @@ import {
   MapPin,
   MessageCircle,
   Phone,
+  Instagram,
   Trash2,
   Loader2,
 } from "lucide-react";
@@ -27,14 +28,14 @@ function ListingDetail() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [active, setActive] = useState(0);
-  const [showPhone, setShowPhone] = useState(false);
+  const [showContact, setShowContact] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("listings")
-        .select("*, profiles:seller_id(full_name,verified,college,department,phone,avatar_url)")
+        .select("*, profiles:seller_id(full_name,verified,college,department,phone,whatsapp,instagram,preferred_contact,avatar_url)")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
