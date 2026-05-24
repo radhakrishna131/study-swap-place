@@ -300,6 +300,20 @@ function ListingDetail() {
           )}
         </div>
       </div>
+      {seller && (
+        <BuyRequestModal
+          open={buyOpen}
+          onOpenChange={setBuyOpen}
+          listing={{ id: data.id, title: data.title, price: Number(data.price) }}
+          seller={{
+            id: data.seller_id,
+            full_name: seller.full_name,
+            whatsapp: seller.whatsapp,
+            phone: seller.phone,
+            preferred_contact: seller.preferred_contact,
+          }}
+        />
+      )}
     </div>
   );
 }
