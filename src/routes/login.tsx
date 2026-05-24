@@ -55,13 +55,13 @@ function LoginPage() {
           <p className="text-muted-foreground mt-1 text-sm">Sign in to your campus account.</p>
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">College email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@college.edu"
+                placeholder="you@gmail.com"
                 autoComplete="email"
                 required
               />
