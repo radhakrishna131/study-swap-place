@@ -226,6 +226,15 @@ function ListingDetail() {
             </div>
           ) : (
             <div className="space-y-2">
+              {data.status === "available" && (
+                <Button
+                  size="lg"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
+                  onClick={() => setBuyOpen(true)}
+                >
+                  <ShoppingBag className="h-4 w-4" /> Buy Now · Request Pickup
+                </Button>
+              )}
               {seller?.phone || seller?.whatsapp || seller?.instagram ? (
                 <>
                   {!showContact ? (
