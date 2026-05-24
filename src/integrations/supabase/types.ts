@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      buy_requests: {
+        Row: {
+          buyer_email: string | null
+          buyer_id: string
+          buyer_name: string
+          buyer_phone: string
+          created_at: string
+          id: string
+          listing_id: string
+          message: string | null
+          pickup_address: string
+          pickup_date: string
+          pickup_time: string
+          seller_id: string
+          status: Database["public"]["Enums"]["buy_request_status"]
+          updated_at: string
+        }
+        Insert: {
+          buyer_email?: string | null
+          buyer_id: string
+          buyer_name: string
+          buyer_phone: string
+          created_at?: string
+          id?: string
+          listing_id: string
+          message?: string | null
+          pickup_address: string
+          pickup_date: string
+          pickup_time: string
+          seller_id: string
+          status?: Database["public"]["Enums"]["buy_request_status"]
+          updated_at?: string
+        }
+        Update: {
+          buyer_email?: string | null
+          buyer_id?: string
+          buyer_name?: string
+          buyer_phone?: string
+          created_at?: string
+          id?: string
+          listing_id?: string
+          message?: string | null
+          pickup_address?: string
+          pickup_date?: string
+          pickup_time?: string
+          seller_id?: string
+          status?: Database["public"]["Enums"]["buy_request_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buy_requests_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -102,6 +161,39 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -158,6 +250,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      buy_request_status: "pending" | "accepted" | "rejected" | "completed"
       listing_category:
         | "books"
         | "notes"
@@ -297,6 +390,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      buy_request_status: ["pending", "accepted", "rejected", "completed"],
       listing_category: [
         "books",
         "notes",

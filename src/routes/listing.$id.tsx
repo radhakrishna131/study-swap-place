@@ -10,6 +10,7 @@ import {
   Instagram,
   Trash2,
   Loader2,
+  ShoppingBag,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +18,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { categoryLabel, conditionLabel } from "@/lib/categories";
+import { BuyRequestModal } from "@/components/BuyRequestModal";
 
 export const Route = createFileRoute("/listing/$id")({
   component: ListingDetail,
@@ -29,6 +31,7 @@ function ListingDetail() {
   const qc = useQueryClient();
   const [active, setActive] = useState(0);
   const [showContact, setShowContact] = useState(false);
+  const [buyOpen, setBuyOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
@@ -223,6 +226,15 @@ function ListingDetail() {
             </div>
           ) : (
             <div className="space-y-2">
+              {data.status === "available" && (
+                <Button
+                  size="lg"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
+                  onClick={() => setBuyOpen(true)}
+                >
+                  <ShoppingBag className="h-4 w-4" /> Buy Now · Request Pickup
+                </Button>
+              )}
               {seller?.phone || seller?.whatsapp || seller?.instagram ? (
                 <>
                   {!showContact ? (
@@ -288,6 +300,20 @@ function ListingDetail() {
           )}
         </div>
       </div>
+      {seller && (
+        <BuyRequestModal
+          open={buyOpen}
+          onOpenChange={setBuyOpen}
+          listing={{ id: data.id, title: data.title, price: Number(data.price) }}
+          seller={{
+            id: data.seller_id,
+            full_name: seller.full_name,
+            whatsapp: seller.whatsapp,
+            phone: seller.phone,
+            preferred_contact: seller.preferred_contact,
+          }}
+        />
+      )}
     </div>
   );
 }

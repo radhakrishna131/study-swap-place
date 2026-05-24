@@ -153,8 +153,15 @@ function ProfilePage() {
           >
             <option value="phone">Phone call</option>
             <option value="whatsapp">WhatsApp</option>
+            <option value="email">Email</option>
             <option value="instagram">Instagram DM</option>
+            <option value="in_app">In-app only</option>
           </select>
+        </div>
+        <div className="sm:col-span-2">
+          <a href="/requests" className="text-sm font-bold underline">
+            → View your buy requests dashboard
+          </a>
         </div>
         <div className="sm:col-span-2">
           <Button type="submit" disabled={saving}>
