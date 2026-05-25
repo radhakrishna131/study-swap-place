@@ -2,7 +2,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/firebase/config";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { useAuth } from "@/lib/auth-context";
 import { ListingCard, type ListingCardData } from "@/components/ListingCard";
 
@@ -20,31 +21,48 @@ function SavedPage() {
   }, [user, loading, navigate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["saved", user?.id],
+    queryKey: ["saved", user?.uid],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("favorites")
-        .select("listing:listings(id,title,price,images,category,college,hostel,status,profiles:seller_id(full_name,verified))")
-        .eq("user_id", user!.id);
-      if (error) throw error;
-      return (data ?? [])
-        .map((row) => {
-          const l = Array.isArray(row.listing) ? row.listing[0] : row.listing;
-          if (!l) return null;
-          return {
-            id: l.id,
-            title: l.title,
-            price: l.price,
-            images: l.images ?? [],
-            category: l.category,
-            college: l.college,
-            hostel: l.hostel,
-            status: l.status,
-            seller: Array.isArray(l.profiles) ? l.profiles[0] : l.profiles,
-          } as ListingCardData;
-        })
-        .filter(Boolean) as ListingCardData[];
+      if (!user) return [];
+      const q = query(
+        collection(db, "favorites"),
+        where("user_id", "==", user.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      
+      const favorites: ListingCardData[] = [];
+      
+      for (const doc of querySnapshot.docs) {
+        const favoriteData = doc.data();
+        
+        // If listing_id is stored, fetch the listing
+        if (favoriteData.listing_id) {
+          const listingDoc = await getDocs(
+            query(
+              collection(db, "listings"),
+              where("__name__", "==", favoriteData.listing_id)
+            )
+          );
+          
+          if (!listingDoc.empty) {
+            const listingData = listingDoc.docs[0].data();
+            favorites.push({
+              id: listingDoc.docs[0].id,
+              title: listingData.title,
+              price: listingData.price,
+              images: listingData.images ?? [],
+              category: listingData.category,
+              college: listingData.college,
+              hostel: listingData.hostel,
+              status: listingData.status,
+              seller: listingData.seller,
+            } as ListingCardData);
+          }
+        }
+      }
+      
+      return favorites;
     },
   });
 
