@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, BadgeCheck, Save } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, BadgeCheck, Save, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/profile")({
 function ProfilePage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [form, setForm] = useState({
     full_name: "",
     college: "",
@@ -29,6 +30,8 @@ function ProfilePage() {
     preferred_contact: "phone",
   });
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -60,6 +63,10 @@ function ProfilePage() {
         instagram: (profile as { instagram?: string }).instagram ?? "",
         preferred_contact: (profile as { preferred_contact?: string }).preferred_contact ?? "phone",
       });
+      // Set preview URL from existing avatar
+      if (profile.avatar_url) {
+        setPreviewUrl(profile.avatar_url);
+      }
     }
   }, [profile]);
 
@@ -76,6 +83,77 @@ function ProfilePage() {
       return (data ?? []) as ListingCardData[];
     },
   });
+
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      // Create a preview URL for immediate display
+      const localPreviewUrl = URL.createObjectURL(file);
+      setPreviewUrl(localPreviewUrl);
+
+      // Upload to Supabase storage
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/avatar.${ext}`;
+
+      // Delete old avatar if it exists
+      if (profile?.avatar_url) {
+        try {
+          const oldPath = profile.avatar_url.split("/").slice(-1)[0];
+          await supabase.storage.from("avatars").remove([`${user.id}/${oldPath}`]);
+        } catch (err) {
+          // Silently fail if old file doesn't exist
+        }
+      }
+
+      // Upload new avatar
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { cacheControl: "3600", upsert: true });
+
+      if (upErr) throw upErr;
+
+      // Get public URL
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const avatarUrl = data.publicUrl;
+
+      // Update profile with avatar URL
+      const { error: updateErr } = await supabase
+        .from("profiles")
+        .update({ avatar_url: avatarUrl })
+        .eq("id", user.id);
+
+      if (updateErr) throw updateErr;
+
+      toast.success("Profile photo updated!");
+      setPreviewUrl(avatarUrl);
+      refetch();
+      qc.invalidateQueries({ queryKey: ["profile"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload photo");
+      // Reset preview on error
+      if (profile?.avatar_url) {
+        setPreviewUrl(profile.avatar_url);
+      }
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = "";
+    }
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -102,8 +180,32 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-8 space-y-10">
       <div className="flex items-center gap-4">
-        <div className="h-16 w-16 rounded-2xl bg-primary border-2 border-ink grid place-items-center font-display text-2xl font-bold shadow-pop-sm">
-          {form.full_name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase()}
+        <div className="relative group">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="Profile"
+              className="h-16 w-16 rounded-2xl border-2 border-ink object-cover shadow-pop-sm"
+            />
+          ) : (
+            <div className="h-16 w-16 rounded-2xl bg-primary border-2 border-ink grid place-items-center font-display text-2xl font-bold shadow-pop-sm">
+              {form.full_name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase()}
+            </div>
+          )}
+          <label
+            htmlFor="avatar-upload"
+            className="absolute inset-0 rounded-2xl bg-black/50 grid place-items-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+          >
+            <Upload className="h-5 w-5 text-white" />
+          </label>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            onChange={handlePhotoChange}
+            disabled={uploadingPhoto}
+            className="hidden"
+          />
         </div>
         <div>
           <h1 className="font-display text-3xl font-bold flex items-center gap-2">
@@ -164,8 +266,8 @@ function ProfilePage() {
           </a>
         </div>
         <div className="sm:col-span-2">
-          <Button type="submit" disabled={saving}>
-            <Save className="h-4 w-4" /> {saving ? "Saving…" : "Save changes"}
+          <Button type="submit" disabled={saving || uploadingPhoto}>
+            <Save className="h-4 w-4" /> {saving ? "Saving…" : uploadingPhoto ? "Uploading photo…" : "Save changes"}
           </Button>
         </div>
       </form>
