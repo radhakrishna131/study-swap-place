@@ -136,7 +136,7 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-8 space-y-10">
       <div className="flex items-center gap-4">
-        <label className="relative group cursor-pointer">
+        <label className="relative cursor-pointer">
           <div className="h-20 w-20 rounded-2xl bg-primary border-2 border-ink grid place-items-center font-display text-3xl font-bold shadow-pop-sm overflow-hidden">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
@@ -144,11 +144,11 @@ function ProfilePage() {
               form.full_name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase()
             )}
           </div>
-          <div className="absolute inset-0 rounded-2xl bg-ink/60 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-ink text-background grid place-items-center border-2 border-background shadow-pop-sm">
             {uploadingAvatar ? (
-              <Loader2 className="h-6 w-6 animate-spin text-background" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Camera className="h-6 w-6 text-background" />
+              <Camera className="h-4 w-4" />
             )}
           </div>
           <input
