@@ -247,10 +247,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      expire_old_buy_requests: { Args: never; Returns: undefined }
     }
     Enums: {
-      buy_request_status: "pending" | "accepted" | "rejected" | "completed"
+      buy_request_status:
+        | "pending"
+        | "accepted"
+        | "rejected"
+        | "completed"
+        | "expired"
       listing_category:
         | "books"
         | "notes"
@@ -390,7 +395,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      buy_request_status: ["pending", "accepted", "rejected", "completed"],
+      buy_request_status: [
+        "pending",
+        "accepted",
+        "rejected",
+        "completed",
+        "expired",
+      ],
       listing_category: [
         "books",
         "notes",

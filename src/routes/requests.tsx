@@ -26,7 +26,7 @@ type BuyRequest = {
   pickup_date: string;
   pickup_time: string;
   message: string | null;
-  status: "pending" | "accepted" | "rejected" | "completed";
+  status: "pending" | "accepted" | "rejected" | "completed" | "expired";
   created_at: string;
   listings?: { title: string; price: number; images: string[] } | null;
 };
@@ -135,7 +135,9 @@ function statusColor(s: BuyRequest["status"]) {
       ? "bg-success text-background"
       : s === "rejected"
         ? "bg-destructive text-background"
-        : "bg-ink text-background";
+        : s === "expired"
+          ? "bg-muted text-muted-foreground"
+          : "bg-ink text-background";
 }
 
 function RequestCard({
