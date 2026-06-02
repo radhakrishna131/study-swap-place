@@ -29,6 +29,7 @@ function ProfilePage() {
     preferred_contact: "phone",
   });
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
