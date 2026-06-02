@@ -168,13 +168,6 @@ function ProfilePage() {
           <p className="text-xs text-muted-foreground mt-1">Tap photo to change</p>
         </div>
       </div>
-          <h1 className="font-display text-3xl font-bold flex items-center gap-2">
-            {form.full_name || "Your profile"}
-            {profile?.verified && <BadgeCheck className="h-6 w-6 text-success" />}
-          </h1>
-          <p className="text-sm text-muted-foreground">{user.email}</p>
-        </div>
-      </div>
 
       <form onSubmit={save} className="rounded-3xl border-2 border-ink p-6 bg-card shadow-pop-sm grid sm:grid-cols-2 gap-4">
         <div className="space-y-2 sm:col-span-2">
