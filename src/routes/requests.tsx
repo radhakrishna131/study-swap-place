@@ -135,7 +135,9 @@ function statusColor(s: BuyRequest["status"]) {
       ? "bg-success text-background"
       : s === "rejected"
         ? "bg-destructive text-background"
-        : "bg-ink text-background";
+        : s === "expired"
+          ? "bg-muted text-muted-foreground"
+          : "bg-ink text-background";
 }
 
 function RequestCard({
