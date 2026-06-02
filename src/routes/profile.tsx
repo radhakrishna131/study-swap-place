@@ -136,10 +136,38 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-8 space-y-10">
       <div className="flex items-center gap-4">
-        <div className="h-16 w-16 rounded-2xl bg-primary border-2 border-ink grid place-items-center font-display text-2xl font-bold shadow-pop-sm">
-          {form.full_name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase()}
-        </div>
+        <label className="relative group cursor-pointer">
+          <div className="h-20 w-20 rounded-2xl bg-primary border-2 border-ink grid place-items-center font-display text-3xl font-bold shadow-pop-sm overflow-hidden">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+            ) : (
+              form.full_name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase()
+            )}
+          </div>
+          <div className="absolute inset-0 rounded-2xl bg-ink/60 grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity">
+            {uploadingAvatar ? (
+              <Loader2 className="h-6 w-6 animate-spin text-background" />
+            ) : (
+              <Camera className="h-6 w-6 text-background" />
+            )}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            disabled={uploadingAvatar}
+            onChange={handleAvatarChange}
+          />
+        </label>
         <div>
+          <h1 className="font-display text-3xl font-bold flex items-center gap-2">
+            {form.full_name || "Your profile"}
+            {profile?.verified && <BadgeCheck className="h-6 w-6 text-success" />}
+          </h1>
+          <p className="text-sm text-muted-foreground">{user.email}</p>
+          <p className="text-xs text-muted-foreground mt-1">Tap photo to change</p>
+        </div>
+      </div>
           <h1 className="font-display text-3xl font-bold flex items-center gap-2">
             {form.full_name || "Your profile"}
             {profile?.verified && <BadgeCheck className="h-6 w-6 text-success" />}
