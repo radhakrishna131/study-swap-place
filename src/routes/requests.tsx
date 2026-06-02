@@ -26,7 +26,7 @@ type BuyRequest = {
   pickup_date: string;
   pickup_time: string;
   message: string | null;
-  status: "pending" | "accepted" | "rejected" | "completed";
+  status: "pending" | "accepted" | "rejected" | "completed" | "expired";
   created_at: string;
   listings?: { title: string; price: number; images: string[] } | null;
 };
