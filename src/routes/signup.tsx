@@ -55,6 +55,15 @@ function SignupPage() {
     navigate({ to: "/login" });
   }
 
+  async function onGoogle() {
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/browse`,
+    });
+    if (result.error) {
+      toast.error(result.error.message || "Google sign-in failed");
+    }
+  }
+
   return (
     <div className="min-h-[calc(100vh-4rem)] grid place-items-center px-4 py-12">
       <div className="w-full max-w-md">
