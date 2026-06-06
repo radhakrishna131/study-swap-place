@@ -40,12 +40,12 @@ function LoginPage() {
       return;
     }
     toast.success("Welcome back!");
-    navigate({ to: "/browse" });
+    navigate({ to: "/profile" });
   }
 
   async function onGoogle() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/browse`,
+      redirect_uri: `${window.location.origin}/profile`,
     });
     if (result.error) {
       toast.error(result.error.message || "Google sign-in failed");

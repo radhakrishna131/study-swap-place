@@ -42,7 +42,7 @@ function SignupPage() {
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/browse`,
+        emailRedirectTo: `${window.location.origin}/profile`,
         data: { full_name: form.full_name, college: form.college },
       },
     });
@@ -51,13 +51,13 @@ function SignupPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Check your email to confirm your account.");
-    navigate({ to: "/login" });
+    toast.success("Account created — welcome!");
+    navigate({ to: "/profile" });
   }
 
   async function onGoogle() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/browse`,
+      redirect_uri: `${window.location.origin}/profile`,
     });
     if (result.error) {
       toast.error(result.error.message || "Google sign-in failed");
