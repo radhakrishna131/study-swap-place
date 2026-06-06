@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { CATEGORIES, CONDITIONS, type CategoryKey } from "@/lib/categories";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 const schema = z.object({
   title: z.string().trim().min(3, "Title too short").max(100),
