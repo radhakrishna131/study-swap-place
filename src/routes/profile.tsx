@@ -103,16 +103,10 @@ function ProfilePage() {
     }
     setUploadingAvatar(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("listing-images")
-        .upload(path, file, { cacheControl: "3600", upsert: true });
-      if (upErr) throw upErr;
-      const { data } = supabase.storage.from("listing-images").getPublicUrl(path);
+      const url = await uploadToCloudinary(file, `campuscart/avatars/${user.id}`);
       const { error: updErr } = await supabase
         .from("profiles")
-        .update({ avatar_url: data.publicUrl })
+        .update({ avatar_url: url })
         .eq("id", user.id);
       if (updErr) throw updErr;
       toast.success("Photo updated");
