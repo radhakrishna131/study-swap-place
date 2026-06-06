@@ -81,14 +81,8 @@ function SellPage() {
     try {
       const urls: string[] = [];
       for (const file of images) {
-        const ext = file.name.split(".").pop() || "jpg";
-        const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("listing-images")
-          .upload(path, file, { cacheControl: "3600", upsert: false });
-        if (upErr) throw upErr;
-        const { data } = supabase.storage.from("listing-images").getPublicUrl(path);
-        urls.push(data.publicUrl);
+        const url = await uploadToCloudinary(file, `campuscart/listings/${user.id}`);
+        urls.push(url);
       }
 
       // Use seller's college from profile
