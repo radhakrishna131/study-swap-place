@@ -85,4 +85,3 @@ Deno.serve(async (req) => {
     service_role_key: serviceRoleKey,
   });
 });
-
