@@ -13,6 +13,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { BottomNav } from "@/components/BottomNav";
+import { ThemeProvider, themeInitScript } from "@/lib/theme-context";
 
 import appCss from "../styles.css?url";
 
@@ -93,6 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "sitemap", type: "application/xml", href: "/sitemap.xml" },
     ],
     scripts: [
+      { children: themeInitScript },
       {
         type: "application/ld+json",
         children: JSON.stringify({
@@ -142,17 +144,19 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AuthSync />
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1 pb-20 md:pb-0">
-            <Outlet />
-          </main>
-          <BottomNav />
-        </div>
-        <Toaster />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AuthSync />
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 pb-20 md:pb-0 animate-fade-in">
+              <Outlet />
+            </main>
+            <BottomNav />
+          </div>
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
