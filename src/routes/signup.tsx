@@ -85,7 +85,12 @@ function SignupPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="college">College</Label>
-              <Input id="college" placeholder="e.g. IIT Madras" value={form.college} onChange={(e) => set("college", e.target.value)} required />
+              <Input id="college" list="signup-college-list" placeholder="Start typing — e.g. IIT Madras" value={form.college} onChange={(e) => set("college", e.target.value)} required />
+              <datalist id="signup-college-list">
+                {COLLEGES.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">College email</Label>
