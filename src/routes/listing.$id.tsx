@@ -325,6 +325,25 @@ function ListingDetail() {
           }}
         />
       )}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className="border-2 border-ink shadow-pop">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">Delete this listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action can't be undone. Your listing and its photos will be removed permanently.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-2 border-ink">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={deleteListing}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 border-2 border-ink"
+            >
+              <Trash2 className="h-4 w-4" /> Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
