@@ -8,6 +8,7 @@ import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { COLLEGES } from "@/lib/colleges";
 
 const schema = z.object({
   full_name: z.string().trim().min(2, "Name too short").max(80),
