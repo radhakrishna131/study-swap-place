@@ -8,6 +8,7 @@ import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { COLLEGES } from "@/lib/colleges";
 
 const schema = z.object({
   full_name: z.string().trim().min(2, "Name too short").max(80),
@@ -84,7 +85,12 @@ function SignupPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="college">College</Label>
-              <Input id="college" placeholder="e.g. IIT Madras" value={form.college} onChange={(e) => set("college", e.target.value)} required />
+              <Input id="college" list="signup-college-list" placeholder="Start typing — e.g. IIT Madras" value={form.college} onChange={(e) => set("college", e.target.value)} required />
+              <datalist id="signup-college-list">
+                {COLLEGES.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">College email</Label>
