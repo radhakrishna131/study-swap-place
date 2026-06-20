@@ -95,12 +95,12 @@ function BrowsePage() {
 
   function updateSearch(patch: Record<string, string | number | undefined>) {
     navigate({
-      search: (s) => {
+      search: (s: Record<string, unknown>) => {
         const next = { ...s, ...patch } as Record<string, unknown>;
         for (const k of Object.keys(next)) {
           if (next[k] === "" || next[k] === undefined || Number.isNaN(next[k] as number)) delete next[k];
         }
-        return next as typeof s;
+        return next;
       },
     });
   }
