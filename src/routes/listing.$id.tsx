@@ -136,12 +136,12 @@ function ListingDetail() {
   }
 
   async function deleteListing() {
-    if (!confirm("Delete this listing?")) return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Listing deleted");
     navigate({ to: "/profile" });
   }
+
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
