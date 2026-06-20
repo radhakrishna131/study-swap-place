@@ -59,6 +59,7 @@
   /* Core palette */
   --ink: oklch(0.16 0.02 95);            /* near-black with warm undertone */
   --surface: oklch(0.985 0.005 95);      /* warm off-white */
+  --hero-gradient: linear-gradient(135deg, oklch(0.93 0.18 95) 0%, oklch(0.88 0.21 88) 100%);
 
   --background: oklch(0.985 0.005 95);
   --foreground: oklch(0.16 0.02 95);
