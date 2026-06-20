@@ -50,7 +50,7 @@
   --shadow-pop-sm: 0 3px 0 0 var(--ink);
   --shadow-soft: 0 10px 40px -10px oklch(0 0 0 / 0.18);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.93 0.18 95) 0%, oklch(0.88 0.21 88) 100%);
+  --gradient-hero: var(--hero-gradient);
 }
 
 :root {
