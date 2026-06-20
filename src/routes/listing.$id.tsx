@@ -231,7 +231,7 @@ function ListingDetail() {
               {data.status === "available" && (
                 <Button onClick={markSold} className="flex-1">Mark as sold</Button>
               )}
-              <Button onClick={deleteListing} variant="outline" className="border-2 border-ink">
+              <Button onClick={() => setDeleteOpen(true)} variant="outline" className="border-2 border-ink">
                 <Trash2 className="h-4 w-4" /> Delete
               </Button>
             </div>
