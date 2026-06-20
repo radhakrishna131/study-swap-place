@@ -17,6 +17,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { categoryLabel, conditionLabel } from "@/lib/categories";
 import { BuyRequestModal } from "@/components/BuyRequestModal";
 
@@ -32,6 +42,7 @@ function ListingDetail() {
   const [active, setActive] = useState(0);
   const [showContact, setShowContact] = useState(false);
   const [buyOpen, setBuyOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
@@ -125,12 +136,12 @@ function ListingDetail() {
   }
 
   async function deleteListing() {
-    if (!confirm("Delete this listing?")) return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Listing deleted");
     navigate({ to: "/profile" });
   }
+
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
@@ -220,7 +231,7 @@ function ListingDetail() {
               {data.status === "available" && (
                 <Button onClick={markSold} className="flex-1">Mark as sold</Button>
               )}
-              <Button onClick={deleteListing} variant="outline" className="border-2 border-ink">
+              <Button onClick={() => setDeleteOpen(true)} variant="outline" className="border-2 border-ink">
                 <Trash2 className="h-4 w-4" /> Delete
               </Button>
             </div>
@@ -314,6 +325,25 @@ function ListingDetail() {
           }}
         />
       )}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className="border-2 border-ink shadow-pop">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display">Delete this listing?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action can't be undone. Your listing and its photos will be removed permanently.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-2 border-ink">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={deleteListing}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 border-2 border-ink"
+            >
+              <Trash2 className="h-4 w-4" /> Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
