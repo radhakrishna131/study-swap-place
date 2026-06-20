@@ -173,7 +173,15 @@
   .text-ink { color: var(--ink); }
   .shadow-pop { box-shadow: var(--shadow-pop); }
   .shadow-pop-sm { box-shadow: var(--shadow-pop-sm); }
-  .bg-gradient-hero { background-image: var(--gradient-hero); }
+  .bg-gradient-hero {
+    background-image: var(--gradient-hero);
+    /* Yellow hero stays light in both themes — pin tokens to the dark-on-light scheme */
+    --ink: oklch(0.16 0.02 95);
+    --background: oklch(0.985 0.005 95);
+    --foreground: oklch(0.16 0.02 95);
+    color: var(--foreground);
+    color-scheme: light;
+  }
 
   .hover-lift { transition: transform 200ms ease, box-shadow 200ms ease; }
   .hover-lift:hover { transform: translateY(-2px); }
