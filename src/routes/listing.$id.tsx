@@ -42,6 +42,7 @@ function ListingDetail() {
   const [active, setActive] = useState(0);
   const [showContact, setShowContact] = useState(false);
   const [buyOpen, setBuyOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["listing", id],
