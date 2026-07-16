@@ -1,0 +1,306 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://wdcgayammjwrelrzdbta.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "campuscart-mcp",
+      "version": "0.1.0",
+      "title": "CampusCart"
+    },
+    "tools": [
+      {
+        "name": "search_listings",
+        "title": "Search CampusCart listings",
+        "description": "Search available marketplace listings by keyword, college, category, and price range. Returns the most recent matches first.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Keyword to match against title/description."
+            },
+            "college": {
+              "type": "string",
+              "maxLength": 120,
+              "description": "Filter by college name (exact match)."
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "books",
+                "electronics",
+                "furniture",
+                "clothing",
+                "sports",
+                "stationery",
+                "hostel",
+                "other"
+              ],
+              "description": "Filter by listing category."
+            },
+            "min_price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max_price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Max results, default 20."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_listing",
+        "title": "Get listing details",
+        "description": "Fetch full details for a single CampusCart listing by id, including seller contact preferences.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Listing id (uuid)."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_my_listings",
+        "title": "List my listings",
+        "description": "List the signed-in user's CampusCart listings, optionally filtered by status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "available",
+                "reserved",
+                "sold"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_listing",
+        "title": "Create a listing",
+        "description": "Create a new CampusCart listing for the signed-in user. The listing is created as 'available' and appears in the marketplace immediately.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 2000
+            },
+            "price": {
+              "type": "number",
+              "minimum": 0
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "books",
+                "electronics",
+                "furniture",
+                "clothing",
+                "sports",
+                "stationery",
+                "hostel",
+                "other"
+              ]
+            },
+            "condition": {
+              "type": "string",
+              "enum": [
+                "new",
+                "like_new",
+                "good",
+                "fair",
+                "poor"
+              ]
+            },
+            "college": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            },
+            "hostel": {
+              "type": "string",
+              "maxLength": 120
+            },
+            "pickup_location": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "negotiable": {
+              "type": "boolean"
+            },
+            "images": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              },
+              "maxItems": 6,
+              "description": "Public image URLs (e.g. hosted on Cloudinary)."
+            }
+          },
+          "required": [
+            "title",
+            "price",
+            "category",
+            "condition",
+            "college"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_buy_requests",
+        "title": "List buy requests",
+        "description": "List the signed-in user's buy requests. Direction 'incoming' returns requests on your listings; 'sent' returns requests you sent to others.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "direction": {
+              "type": "string",
+              "enum": [
+                "incoming",
+                "sent"
+              ]
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "accepted",
+                "rejected",
+                "completed",
+                "expired"
+              ]
+            }
+          },
+          "required": [
+            "direction"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "update_buy_request",
+        "title": "Update a buy request",
+        "description": "Update the status of a buy request. Only the seller of the underlying listing can accept/reject/complete a request via RLS.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "accepted",
+                "rejected",
+                "completed"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "status"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_my_profile",
+        "title": "Get my profile",
+        "description": "Return the signed-in CampusCart user's profile (name, college, contact preferences, verification).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
