@@ -17,13 +17,21 @@ const schema = z.object({
   password: z.string().min(6, "At least 6 characters").max(72),
 });
 
+function safeNext(next: unknown): string {
+  if (typeof next !== "string") return "/profile";
+  if (!next.startsWith("/") || next.startsWith("//")) return "/profile";
+  return next;
+}
+
 export const Route = createFileRoute("/signup")({
+  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s.next) }),
   component: SignupPage,
   head: () => ({ meta: [{ title: "Join CampusCart" }] }),
 });
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [form, setForm] = useState({ full_name: "", college: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +51,7 @@ function SignupPage() {
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/profile`,
+        emailRedirectTo: `${window.location.origin}${next}`,
         data: { full_name: form.full_name, college: form.college },
       },
     });
@@ -53,12 +61,12 @@ function SignupPage() {
       return;
     }
     toast.success("Account created — welcome!");
-    navigate({ to: "/profile" });
+    navigate({ to: next });
   }
 
   async function onGoogle() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/profile`,
+      redirect_uri: `${window.location.origin}${next}`,
     });
     if (result.error) {
       toast.error(result.error.message || "Google sign-in failed");

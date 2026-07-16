@@ -14,13 +14,21 @@ const schema = z.object({
   password: z.string().min(6, "At least 6 characters").max(72),
 });
 
+function safeNext(next: unknown): string {
+  if (typeof next !== "string") return "/profile";
+  if (!next.startsWith("/") || next.startsWith("//")) return "/profile";
+  return next;
+}
+
 export const Route = createFileRoute("/login")({
+  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s.next) }),
   component: LoginPage,
   head: () => ({ meta: [{ title: "Sign in — CampusCart" }] }),
 });
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,12 +48,12 @@ function LoginPage() {
       return;
     }
     toast.success("Welcome back!");
-    navigate({ to: "/profile" });
+    navigate({ to: next });
   }
 
   async function onGoogle() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/profile`,
+      redirect_uri: `${window.location.origin}${next}`,
     });
     if (result.error) {
       toast.error(result.error.message || "Google sign-in failed");
@@ -107,7 +115,7 @@ function LoginPage() {
           </Button>
           <p className="mt-6 text-center text-sm text-muted-foreground">
             New here?{" "}
-            <Link to="/signup" className="font-semibold text-ink hover:underline">
+            <Link to="/signup" search={{ next }} className="font-semibold text-ink hover:underline">
               Create an account
             </Link>
           </p>
